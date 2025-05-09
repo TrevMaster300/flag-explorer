@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build-backend:
+  build-and-test:
     name: Build & Test .NET Backend
     runs-on: ubuntu-latest
 
@@ -19,11 +19,11 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore
-        run: dotnet restore FlagExplorerAPI/FlagExplorerAPI.csproj
+      - name: Restore solution
+        run: dotnet restore FlagExplorerAPI.sln
 
-      - name: Build
-        run: dotnet build FlagExplorerAPI/FlagExplorerAPI.csproj --no-restore --configuration Release
+      - name: Build solution
+        run: dotnet build FlagExplorerAPI.sln --no-restore --configuration Release
 
-      - name: Test
-        run: dotnet test FlagExplorerAPI/FlagExplorerAPI.Tests/FlagExplorerAPI.Tests.csproj --no-build --configuration Release
+      - name: Run all tests
+        run: dotnet test FlagExplorerAPI.sln --no-build --configuration Release
