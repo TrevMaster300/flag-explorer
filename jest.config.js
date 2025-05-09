@@ -1,10 +1,11 @@
+// jest.config.js
 module.exports = {
-  testEnvironment: 'jsdom',
   transform: {
-    '^.+\\.(js|jsx)$': 'babel-jest',
+    // use babel-jest for all .js/.jsx files
+    '^.+\\.(js|jsx)$': 'babel-jest'
   },
   transformIgnorePatterns: [
-    '/node_modules/(?!(axios)/)', // Transform axios
-  ],
-  moduleFileExtensions: ['js', 'jsx'],
+    // ignore all node_modules EXCEPT axios
+    'node_modules/(?!(axios)/)'
+  ]
 };

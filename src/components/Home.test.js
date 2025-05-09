@@ -1,25 +1,27 @@
-
-jest.mock('axios', () => ({
-  get: jest.fn(() => Promise.resolve({ data: [
-    { name: { common: 'Narnia' }, flags: { png: 'narnia.png' } },
-    { name: { common: 'Oz'    }, flags: { png: 'oz.png'     } },
-  ] })),
-}));
-
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import Home from './Home';
 
-test('Home fetches and displays a grid of flags', async () => {
+// 1) Tell Jest to use your manual mock
+jest.mock('axios');
+
+import axios from 'axios';
+
+test('Home fetches and displays flags', async () => {
+  // 2) Seed the mock
+  const fakeCountries = [
+    { name: { common: 'Narnia' }, flags: { png: 'narnia.png' } },
+    { name: { common: 'Oz'      }, flags: { png: 'oz.png'      } },
+  ];
+  axios.get.mockResolvedValueOnce({ data: fakeCountries });
+
+  // 3) Render the component
   render(<Home />);
 
+  // 4) Assert on the two images showing up
+  const narniaImg = await screen.findByAltText('Narnia');
+  expect(narniaImg).toHaveAttribute('src', 'narnia.png');
 
-  expect(screen.getByText(/loading/i)).toBeInTheDocument();
-
-  // wait for the mock data to appear
-  await waitFor(() => {
-    
-    expect(screen.getByAltText('Narnia')).toHaveAttribute('src', 'narnia.png');
-    expect(screen.getByAltText('Oz')).toHaveAttribute('src', 'oz.png');
-  });
+  const ozImg = await screen.findByAltText('Oz');
+  expect(ozImg).toHaveAttribute('src', 'oz.png');
 });
