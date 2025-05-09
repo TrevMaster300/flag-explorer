@@ -1,29 +1,68 @@
-name: CI
+name: CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  build-and-test:
+  build-backend:
     name: Build & Test .NET Backend
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup .NET SDK
+      - name: Setup .NET 8 SDK
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore solution
-        run: dotnet restore FlagExplorerAPI.sln
+      - name: Restore & build solution
+        run: |
+          dotnet restore FlagExplorerAPI.sln
+          dotnet build  FlagExplorerAPI.sln --no-restore --configuration Release
 
-      - name: Build solution
-        run: dotnet build FlagExplorerAPI.sln --no-restore --configuration Release
-
-      - name: Run all tests
+      - name: Run all backend tests
         run: dotnet test FlagExplorerAPI.sln --no-build --configuration Release
+
+  build-frontend:
+    name: Build React Frontend
+    runs-on: ubuntu-latest
+    needs: build-backend
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install front-end deps
+        working-directory: flag-explorer
+        run: npm ci
+
+      - name: Build production bundle
+        working-directory: flag-explorer
+        run: npm run build
+
+      # frontend tests are intentionally skipped here
+
+  package:
+    name: Package Artifacts
+    runs-on: ubuntu-latest
+    needs: [build-backend, build-frontend]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Upload .NET backend
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-release
+          path: FlagExplorerAPI/bin/Release/net8.0/
+
+      - name: Upload React build
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-build
+          path: flag-explorer/build/
