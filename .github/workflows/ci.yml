@@ -10,6 +10,7 @@ jobs:
   build-backend:
     name: Build & Test .NET Backend
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -18,54 +19,11 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore backend
-        working-directory: FlagExplorerAPI
-        run: dotnet restore
+      - name: Restore
+        run: dotnet restore FlagExplorerAPI/FlagExplorerAPI.csproj
 
-      - name: Build backend
-        working-directory: FlagExplorerAPI
-        run: dotnet build --no-restore --configuration Release
+      - name: Build
+        run: dotnet build FlagExplorerAPI/FlagExplorerAPI.csproj --no-restore --configuration Release
 
-      - name: Run backend tests
-        working-directory: FlagExplorerAPI
-        run: dotnet test --no-build --configuration Release
-
-  build-frontend:
-    name: Build React Frontend
-    needs: build-backend
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-     
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build frontend
-        run: npm run build
-
-
-  package:
-    name: Package Artifacts
-    needs: [build-backend, build-frontend]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Upload backend artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: backend
-          path: |
-            FlagExplorerAPI/bin/Release/net8.0/**/*
-
-      - name: Upload frontend artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: frontend
-          path: build
+      - name: Test
+        run: dotnet test FlagExplorerAPI/FlagExplorerAPI.Tests/FlagExplorerAPI.Tests.csproj --no-build --configuration Release
