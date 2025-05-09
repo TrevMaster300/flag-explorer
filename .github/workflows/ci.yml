@@ -1,3 +1,4 @@
+
 name: CI/CD
 
 on:
@@ -18,7 +19,7 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Restore & Build Solution
+      - name: Restore & Build
         run: |
           dotnet restore FlagExplorerAPI.sln
           dotnet build  FlagExplorerAPI.sln --no-restore --configuration Release
@@ -38,14 +39,14 @@ jobs:
         with:
           node-version: 18
 
-      # ← no working-directory, defaults to repo root
+     
       - name: Install dependencies
         run: npm ci
 
       - name: Build production bundle
         run: npm run build
 
-      # frontend tests are skipped
+      # (we’re skipping `npm test` for the front end)
 
   package:
     name: Package Artifacts
@@ -55,13 +56,13 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Upload backend artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: backend
           path: FlagExplorerAPI/bin/Release/net8.0/
 
       - name: Upload frontend artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: frontend
           path: build/
