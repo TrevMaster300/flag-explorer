@@ -13,17 +13,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup .NET 8 SDK
+      - name: Setup .NET 8
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: 8.0.x
 
-      - name: Restore & build solution
+      - name: Restore & Build Solution
         run: |
           dotnet restore FlagExplorerAPI.sln
           dotnet build  FlagExplorerAPI.sln --no-restore --configuration Release
 
-      - name: Run all backend tests
+      - name: Run Backend Tests
         run: dotnet test FlagExplorerAPI.sln --no-build --configuration Release
 
   build-frontend:
@@ -36,17 +36,16 @@ jobs:
       - name: Setup Node.js 18
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: 18
 
-      - name: Install front-end deps
-        working-directory: flag-explorer
+      # ← no working-directory, defaults to repo root
+      - name: Install dependencies
         run: npm ci
 
       - name: Build production bundle
-        working-directory: flag-explorer
         run: npm run build
 
-      # frontend tests are intentionally skipped here
+      # frontend tests are skipped
 
   package:
     name: Package Artifacts
@@ -55,14 +54,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Upload .NET backend
+      - name: Upload backend artifact
         uses: actions/upload-artifact@v3
         with:
-          name: backend-release
+          name: backend
           path: FlagExplorerAPI/bin/Release/net8.0/
 
-      - name: Upload React build
+      - name: Upload frontend artifact
         uses: actions/upload-artifact@v3
         with:
-          name: frontend-build
-          path: flag-explorer/build/
+          name: frontend
+          path: build/
