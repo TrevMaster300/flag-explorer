@@ -2,9 +2,9 @@ name: CI/CD
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   build-backend:
@@ -25,7 +25,7 @@ jobs:
           dotnet build   FlagExplorerAPI.sln --no-restore --configuration Release
 
       - name: Run API tests
-        run: dotnet test  FlagExplorerAPI.sln --no-build --configuration Release
+        run: dotnet test FlagExplorerAPI.sln --no-build --configuration Release
 
   build-frontend:
     name: Build React Frontend
@@ -54,22 +54,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Show me exactly what's in the API output folder
+      # make sure the API build is actually there:
       - name: Debug .NET output path
-        run: ls -R FlagExplorerAPI/bin/Release/net8.0 || echo "❌ API build folder missing"
+        run: |
+          ls -R FlagExplorerAPI/bin/Release/net8.0 || echo "❌ API build folder missing"
 
       - name: Upload .NET API build
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v3
         with:
           name: backend-build
           path: FlagExplorerAPI/bin/Release/net8.0
 
-      # Show me what's in `build/` (React's output)
+      # make sure the React build is actually there:
       - name: Debug React output path
-        run: ls -R build || echo "❌ React build folder missing"
+        run: |
+          ls -R build || echo "❌ React build folder missing"
 
       - name: Upload React build
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v3
         with:
           name: frontend-build
           path: build
