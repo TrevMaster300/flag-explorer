@@ -45,28 +45,29 @@ jobs:
         run: npm run build
 
   package:
-    name: Package Artifacts
+    name: Zip & Archive Builds
     runs-on: ubuntu-latest
-    needs: [ build-backend, build-frontend ]
+    needs: [build-backend, build-frontend]
     steps:
       - uses: actions/checkout@v3
 
-      - name: Create folders if needed
-        run: mkdir -p out
+      - name: Prepare output folder
+        run: mkdir -p output
 
-      - name: Zip .NET backend build
+      - name: Copy backend build
         run: |
-          zip -r out/backend-build.zip FlagExplorerAPI/bin/Release/net8.0 || echo "Backend zip failed"
+          mkdir -p output/backend
+          cp -r FlagExplorerAPI/bin/Release/net8.0/* output/backend/
 
-      - name: Zip React frontend build
+      - name: Copy frontend build
         run: |
-          zip -r out/frontend-build.zip build || echo "Frontend zip failed"
+          mkdir -p output/frontend
+          cp -r build/* output/frontend/
 
-      - name: List contents of zip folder
-        run: ls -lh out/
+      - name: Zip all builds
+        run: |
+          cd output
+          zip -r packaged-artifacts.zip backend frontend
 
-      - name: Upload zipped artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: all-zipped-artifacts
-          path: out/
+      - name: Show zip contents
+        run: unzip -l output/packaged-artifacts.zip || echo "Zipping failed"
