@@ -44,10 +44,6 @@ jobs:
       - name: Build production bundle
         run: npm run build
 
-      # Optional: enable this if frontend tests are fixed
-      # - name: Run frontend tests
-      #   run: npm test -- --watchAll=false
-
   package:
     name: Package Artifacts
     runs-on: ubuntu-latest
@@ -55,20 +51,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Debug .NET output
-        run: ls -R FlagExplorerAPI/bin/Release/net8.0 || echo "No files in backend output!"
+      - name: Create folders if needed
+        run: mkdir -p out
 
-      - name: Upload .NET API build
-        uses: actions/upload-artifact@59c340c7540cfe60d4ac83216b3bbfc83b8b418d
+      - name: Zip .NET backend build
+        run: |
+          zip -r out/backend-build.zip FlagExplorerAPI/bin/Release/net8.0 || echo "Backend zip failed"
+
+      - name: Zip React frontend build
+        run: |
+          zip -r out/frontend-build.zip build || echo "Frontend zip failed"
+
+      - name: List contents of zip folder
+        run: ls -lh out/
+
+      - name: Upload zipped artifacts
+        uses: actions/upload-artifact@v2
         with:
-          name: backend-build
-          path: FlagExplorerAPI/bin/Release/net8.0
-
-      - name: Debug React output
-        run: ls -R build || echo "No files in frontend output!"
-
-      - name: Upload React build
-        uses: actions/upload-artifact@59c340c7540cfe60d4ac83216b3bbfc83b8b418d
-        with:
-          name: frontend-build
-          path: build
+          name: all-zipped-artifacts
+          path: out/
