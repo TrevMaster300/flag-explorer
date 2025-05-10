@@ -2,35 +2,34 @@ name: CI/CD
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
+
   build-backend:
     name: Build & Test .NET Backend
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup .NET SDK
+      - name: Setup .NET 8
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore & Build
+      - name: Restore & Build API
         run: |
           dotnet restore FlagExplorerAPI.sln
           dotnet build   FlagExplorerAPI.sln --no-restore --configuration Release
 
-      - name: Run Backend Tests
-        run: dotnet test FlagExplorerAPI.sln --no-build --configuration Release
+      - name: Run API tests
+        run: dotnet test  FlagExplorerAPI.sln --no-build --configuration Release
 
-      - name: Upload .NET API build
-        uses: actions/upload-artifact@v3
+      - name: Upload .NET API artifacts
+        uses: actions/upload-artifact@v2     # ← pin to v2
         with:
           name: backend-build
           path: FlagExplorerAPI/bin/Release/net8.0/
@@ -40,10 +39,10 @@ jobs:
     needs: build-backend
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: Setup Node.js 18
         uses: actions/setup-node@v3
         with:
           node-version: '18'
@@ -56,8 +55,8 @@ jobs:
         working-directory: ./flag-explorer
         run: npm run build
 
-      - name: Upload React build
-        uses: actions/upload-artifact@v3
+      - name: Upload React build artifacts
+        uses: actions/upload-artifact@v2     # ← pin to v2
         with:
           name: frontend-build
           path: flag-explorer/build/
