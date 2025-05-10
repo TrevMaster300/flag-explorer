@@ -1,4 +1,3 @@
-# .github/workflows/ci.yml
 name: CI/CD
 
 on:
@@ -9,33 +8,36 @@ on:
 
 jobs:
   build-backend:
-    name: Build and Test .NET Backend
+    name: Build, Test & Package .NET Backend
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup .NET SDK
+      - name: Setup .NET 8 SDK
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore and build
+      - name: Restore & Build
         run: |
           dotnet restore FlagExplorerAPI.sln
           dotnet build FlagExplorerAPI.sln --no-restore --configuration Release
 
-      - name: Run backend tests
+      - name: Run Backend Tests
         run: dotnet test FlagExplorerAPI.sln --no-build --configuration Release
 
-      - name: Upload .NET API build
+      - name: Publish Backend
+        run: dotnet publish FlagExplorerAPI.sln --configuration Release --output publish
+
+      - name: Upload Backend Package
         uses: actions/upload-artifact@v3
         with:
-          name: backend-build
-          path: FlagExplorerAPI/bin/Release/net8.0/**
+          name: backend-package
+          path: publish/**
 
   build-frontend:
-    name: Build React Frontend
+    name: Build, Test & Package React Frontend
     runs-on: ubuntu-latest
     needs: build-backend
     steps:
@@ -47,18 +49,20 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm ci
 
-      - name: Build production bundle
+      - name: Run Frontend Tests
+        run: npm test -- --ci --watchAll=false
+
+      - name: Build Production Bundle
         run: npm run build
 
-      # To re-enable frontend tests, uncomment:
-      # - name: Run frontend tests
-      #   run: npm test -- --watchAll=false
+      - name: Package Frontend
+        run: zip -r frontend.zip build/
 
-      - name: Upload React build
+      - name: Upload Frontend Package
         uses: actions/upload-artifact@v3
         with:
-          name: frontend-build
-          path: build/**
+          name: frontend-package
+          path: frontend.zip
