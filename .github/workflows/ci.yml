@@ -23,10 +23,10 @@ jobs:
       - name: Restore & Build
         run: |
           dotnet restore FlagExplorerAPI.sln
-          dotnet build   FlagExplorerAPI.sln --no-restore --configuration Release
+          dotnet build FlagExplorerAPI.sln --no-restore --configuration Release
 
       - name: Run Backend Tests
-        run: dotnet test  FlagExplorerAPI.sln --no-build   --configuration Release
+        run: dotnet test FlagExplorerAPI.sln --no-build --configuration Release
 
   build-frontend:
     name: Build React Frontend
@@ -57,13 +57,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Debug .NET Output Path
+        run: ls -l FlagExplorerAPI/bin/Release/net8.0/ || echo "Backend output folder missing"
+
       - name: Upload .NET API build
+        if: success()
         uses: actions/upload-artifact@v3
         with:
           name: backend-build
           path: FlagExplorerAPI/bin/Release/net8.0/
 
+      - name: Debug React Output Path
+        run: ls -l build/ || echo "Frontend build folder missing"
+
       - name: Upload React build
+        if: success()
         uses: actions/upload-artifact@v3
         with:
           name: frontend-build
