@@ -40,10 +40,13 @@ jobs:
         with:
           node-version: '18'
 
+      # run npm commands inside your `flag-explorer` folder:
       - name: Install dependencies
+        working-directory: ./flag-explorer
         run: npm ci
 
-      - name: Build React app
+      - name: Build production bundle
+        working-directory: ./flag-explorer
         run: npm run build
 
   package:
@@ -54,10 +57,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # make sure the API build is actually there:
+      # Confirm your API output exists
       - name: Debug .NET output path
         run: |
-          ls -R FlagExplorerAPI/bin/Release/net8.0 || echo "❌ API build folder missing"
+          echo "👀 ls FlagExplorerAPI/bin/Release/net8.0"
+          ls -R FlagExplorerAPI/bin/Release/net8.0 || echo "❌ API build folder missing!"
 
       - name: Upload .NET API build
         uses: actions/upload-artifact@v3
@@ -65,13 +69,14 @@ jobs:
           name: backend-build
           path: FlagExplorerAPI/bin/Release/net8.0
 
-      # make sure the React build is actually there:
+      # Confirm your React output exists
       - name: Debug React output path
         run: |
-          ls -R build || echo "❌ React build folder missing"
+          echo "👀 ls flag-explorer/build"
+          ls -R flag-explorer/build || echo "❌ React build folder missing!"
 
       - name: Upload React build
         uses: actions/upload-artifact@v3
         with:
           name: frontend-build
-          path: build
+          path: flag-explorer/build
