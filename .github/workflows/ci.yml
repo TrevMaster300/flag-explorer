@@ -31,7 +31,7 @@ jobs:
         run: dotnet publish FlagExplorerAPI.sln --configuration Release --output publish
 
       - name: Upload Backend Package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend-package
           path: publish/**
@@ -62,7 +62,7 @@ jobs:
         run: zip -r frontend.zip build/
 
       - name: Upload Frontend Package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-package
           path: frontend.zip
