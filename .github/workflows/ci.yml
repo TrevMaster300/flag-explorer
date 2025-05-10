@@ -2,12 +2,11 @@ name: CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-
   build-backend:
     name: Build & Test .NET Backend
     runs-on: ubuntu-latest
@@ -28,12 +27,6 @@ jobs:
       - name: Run API tests
         run: dotnet test  FlagExplorerAPI.sln --no-build --configuration Release
 
-      - name: Upload .NET API artifacts
-        uses: actions/upload-artifact@v2     # ← pin to v2
-        with:
-          name: backend-build
-          path: FlagExplorerAPI/bin/Release/net8.0/
-
   build-frontend:
     name: Build React Frontend
     needs: build-backend
@@ -48,15 +41,39 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        working-directory: ./flag-explorer
-        run: npm ci
+        run: |
+          cd flag-explorer
+          npm ci
 
       - name: Build production bundle
-        working-directory: ./flag-explorer
-        run: npm run build
+        run: |
+          cd flag-explorer
+          npm run build
 
-      - name: Upload React build artifacts
-        uses: actions/upload-artifact@v2     # ← pin to v2
+  package:
+    name: Package Artifacts
+    needs: [build-backend, build-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Confirm the .NET build output is there
+      - name: Debug .NET Output Path
+        run: ls -R FlagExplorerAPI/bin/Release/net8.0/
+
+      - name: Upload API artifacts
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: backend-build
+          path: FlagExplorerAPI/bin/Release/net8.0/
+
+      # Confirm the React build output is there
+      - name: Debug React Output Path
+        run: ls -R flag-explorer/build/
+
+      - name: Upload React artifacts
+        uses: actions/upload-artifact@v3.1.2
         with:
           name: frontend-build
           path: flag-explorer/build/
