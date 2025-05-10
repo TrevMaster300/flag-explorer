@@ -74,7 +74,6 @@ GitHub Actions runs on every push and pull request to `main`:
 - ✅ Builds and tests backend
 - ✅ Builds frontend
 - 📦 Packages backend and frontend builds as artifacts
-- ❌ Frontend tests are skipped temporarily
 
 ---
 
@@ -106,6 +105,6 @@ flag-explorer/
 
 ---
 
-## 📬 Contact
+## 🧑‍💻 Author
 
-Made with ❤️ by **Trevor Sekoboane**
+Developed by **Trevor Sekoboane**
