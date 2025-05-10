@@ -41,14 +41,10 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: |
-          cd flag-explorer
-          npm ci
+        run: npm ci
 
-      - name: Build production bundle
-        run: |
-          cd flag-explorer
-          npm run build
+      - name: Build React app
+        run: npm run build
 
   package:
     name: Package Artifacts
@@ -58,22 +54,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Confirm the .NET build output is there
-      - name: Debug .NET Output Path
-        run: ls -R FlagExplorerAPI/bin/Release/net8.0/
+      # Show me exactly what's in the API output folder
+      - name: Debug .NET output path
+        run: ls -R FlagExplorerAPI/bin/Release/net8.0 || echo "❌ API build folder missing"
 
-      - name: Upload API artifacts
+      - name: Upload .NET API build
         uses: actions/upload-artifact@v3.1.2
         with:
           name: backend-build
-          path: FlagExplorerAPI/bin/Release/net8.0/
+          path: FlagExplorerAPI/bin/Release/net8.0
 
-      # Confirm the React build output is there
-      - name: Debug React Output Path
-        run: ls -R flag-explorer/build/
+      # Show me what's in `build/` (React's output)
+      - name: Debug React output path
+        run: ls -R build || echo "❌ React build folder missing"
 
-      - name: Upload React artifacts
+      - name: Upload React build
         uses: actions/upload-artifact@v3.1.2
         with:
           name: frontend-build
-          path: flag-explorer/build/
+          path: build
