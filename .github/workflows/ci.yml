@@ -46,7 +46,8 @@ jobs:
       - name: Build production bundle
         run: npm run build
 
-      # we're explicitly skipping `npm test` here
+      # We're explicitly skipping `npm test` here
+      # Uncomment the section below to run frontend tests
       # - name: Run frontend tests
       #   run: npm test -- --watchAll=false
 
@@ -62,7 +63,7 @@ jobs:
 
       - name: Upload .NET API build
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.0
         with:
           name: backend-build
           path: FlagExplorerAPI/bin/Release/net8.0/
@@ -72,7 +73,7 @@ jobs:
 
       - name: Upload React build
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.0
         with:
           name: frontend-build
           path: build/
