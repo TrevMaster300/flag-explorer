@@ -62,7 +62,7 @@ jobs:
 
       - name: Upload .NET API build
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@3c0b4b6b6e9e5d5c3c4f7e3b3a8c1f7b4d8c1e5c
         with:
           name: backend-build
           path: FlagExplorerAPI/bin/Release/net8.0/
@@ -72,7 +72,7 @@ jobs:
 
       - name: Upload React build
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@3c0b4b6b6e9e5d5c3c4f7e3b3a8c1f7b4d8c1e5c
         with:
           name: frontend-build
           path: build/
